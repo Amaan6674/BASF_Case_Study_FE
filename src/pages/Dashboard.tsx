@@ -27,7 +27,9 @@ interface BookRow {
 const Dashboard: React.FC = () => {
     const [books, setBooks] = useState<BookRow[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
-    const [searchTerm, setSearchTerm] = useState<string>('react programming');
+    const [searchTerm, setSearchTerm] = useState<string>(() => {
+        return sessionStorage.getItem('lastSearchTerm') || 'react programming';
+    });
     const [error, setError] = useState<string>('');
     const navigate = useNavigate();
 
@@ -95,11 +97,15 @@ const Dashboard: React.FC = () => {
     }, []);
 
     useEffect(() => {
-        fetchBooks(searchTerm);
+        if (searchTerm.trim()) {
+            sessionStorage.setItem('lastSearchTerm', searchTerm);
+            fetchBooks(searchTerm);
+        }
     }, [fetchBooks, searchTerm]);
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
+        sessionStorage.setItem('lastSearchTerm', searchTerm);
         fetchBooks(searchTerm);
     };
 
